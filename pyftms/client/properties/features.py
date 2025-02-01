@@ -180,22 +180,24 @@ async def read_supported_ranges(
     result: Mapping[str, SettingRange] = {}
 
     _LOGGER.debug("Reading settings value ranges...")
+    services = await cli.get_services()
+    descriptor_uuids = [d.characteristic_uuid for d in services.descriptors.values()]
 
-    if MachineSettings.SPEED in settings:
+    if MachineSettings.SPEED in settings and SPEED_RANGE_UUID in descriptor_uuids:
         result[TARGET_SPEED] = await _range(cli, SPEED_RANGE_UUID, "u2.01")
 
-    if MachineSettings.INCLINE in settings:
+    if MachineSettings.INCLINE in settings and INCLINATION_RANGE_UUID in descriptor_uuids:
         result[TARGET_INCLINATION] = await _range(cli, INCLINATION_RANGE_UUID, "s2.1")
 
-    if MachineSettings.RESISTANCE in settings:
+    if MachineSettings.RESISTANCE in settings and RESISTANCE_LEVEL_RANGE_UUID in descriptor_uuids:
         result[TARGET_RESISTANCE] = await _range(
             cli, RESISTANCE_LEVEL_RANGE_UUID, "s2.1"
         )
 
-    if MachineSettings.POWER in settings:
+    if MachineSettings.POWER in settings and POWER_RANGE_UUID in descriptor_uuids:
         result[TARGET_POWER] = await _range(cli, POWER_RANGE_UUID, "s2")
 
-    if MachineSettings.HEART_RATE in settings:
+    if MachineSettings.HEART_RATE in settings and HEART_RATE_RANGE_UUID in descriptor_uuids:
         result[TARGET_HEART_RATE] = await _range(cli, HEART_RATE_RANGE_UUID, "u1")
 
     _LOGGER.debug("Settings ranges: %s", result)
